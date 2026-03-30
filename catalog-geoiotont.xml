@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri id="Imports Wizard Entry" name="http://purl.oclc.org/NET/UNIS/fiware/iot-lite#" uri="http://iot.ee.surrey.ac.uk/fiware/ontologies/iot-lite"/>
+    <uri id="Imports Wizard Entry" name="http://inter-iot.eu/GOIoTP#" uri="file:/Users/rayis/Downloads/GOIoTP.rdf"/>
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
+        <uri id="Automatically generated entry, Timestamp=1706871678680" name="duplicate:http://www.geoiot.org/ontology" uri="my_geo_ontology.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1706871678680" name="duplicate:http://www.geoiot.org/ontology" uri="new.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1706871678680" name="duplicate:http://www.geoiot.org/ontology" uri="geo_ontology2.rdf"/>
+        <uri id="Automatically generated entry, Timestamp=1706871678680" name="duplicate:http://www.geoiot.org/ontology" uri="my_geo_ontology_new.owl"/>
+    </group>
+</catalog>

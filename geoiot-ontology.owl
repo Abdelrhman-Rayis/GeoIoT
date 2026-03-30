@@ -1,0 +1,1138 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.geoiot.org/ontology#"
+     xml:base="http://www.geoiot.org/ontology"
+     xmlns:giot="http://www.geoiot.org/ontology#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:terms="http://purl.org/dc/terms/"
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+     xmlns:schema="https://schema.org/"
+     xmlns:geo="http://www.opengis.net/ont/geosparql#"
+     xmlns:sosa="http://www.w3.org/ns/sosa/"
+     xmlns:ssn="http://www.w3.org/ns/ssn/"
+     xmlns:bot="https://w3id.org/bot#"
+     xmlns:qudt="http://qudt.org/schema/qudt/"
+     xmlns:prov="http://www.w3.org/ns/prov#">
+
+    <!-- =============================================================
+         Ontology Header
+         ============================================================= -->
+
+    <owl:Ontology rdf:about="http://www.geoiot.org/ontology">
+        <owl:versionIRI rdf:resource="http://www.geoiot.org/ontology/2.0"/>
+        <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.0</owl:versionInfo>
+
+        <!-- Standard Imports -->
+        <owl:imports rdf:resource="http://www.opengis.net/ont/geosparql"/>
+        <owl:imports rdf:resource="http://www.w3.org/ns/sosa/"/>
+        <owl:imports rdf:resource="http://www.w3.org/ns/ssn/"/>
+        <owl:imports rdf:resource="https://w3id.org/bot"/>
+        <owl:imports rdf:resource="http://qudt.org/schema/qudt/"/>
+
+        <dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">GeoIoT Ontology</dc:title>
+        <dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+            The GeoIoT Ontology is a modular OWL 2 ontology that formally integrates
+            geospatial and Internet of Things (IoT) concepts for smart city and smart campus
+            applications. It is organised into three modules: (1) a Spatial Module extending
+            GeoSPARQL and the Building Topology Ontology (BOT); (2) an Observation Module
+            extending SOSA/SSN with IoT-specific stream and quality classes; and (3) an Asset
+            Module that bridges spatial and observational concepts. Additional domain classes
+            preserve the operational vocabulary of the SEND smart energy platform.
+        </dc:description>
+        <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Abdelrhman Rayis, Keele University</dc:creator>
+        <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2024-11-01</terms:created>
+        <terms:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-03-20</terms:modified>
+        <vann:preferredNamespacePrefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string">giot</vann:preferredNamespacePrefix>
+        <vann:preferredNamespaceUri rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http://www.geoiot.org/ontology#</vann:preferredNamespaceUri>
+        <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+            Developed following the NeOn methodology. Evaluated using the HermiT reasoner
+            in Protege. Case study: Keele University SEND smart campus project.
+        </rdfs:comment>
+    </owl:Ontology>
+
+
+    <!-- =============================================================
+         OBJECT PROPERTIES — Spatial Module
+         ============================================================= -->
+
+    <!-- giot:isLocatedIn — transitive spatial containment -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#isLocatedIn">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:comment>Transitive spatial containment. A sensor in a Zone is inferred to also
+        be in the Building and Site that contain that Zone.</rdfs:comment>
+        <rdfs:label>is located in</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:isAdjacentTo — symmetric adjacency between zones -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#isAdjacentTo">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Zone"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#Zone"/>
+        <rdfs:comment>Symmetric adjacency relation between zones sharing a boundary.</rdfs:comment>
+        <rdfs:label>is adjacent to</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:hasGeometry — links spatial entities to GeoSPARQL geometry -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasGeometry">
+        <rdfs:subPropertyOf rdf:resource="http://www.opengis.net/ont/geosparql#hasGeometry"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:range rdf:resource="http://www.opengis.net/ont/geosparql#Geometry"/>
+        <rdfs:comment>Links a SpatialEntity to its GeoSPARQL geometry. Geometry literals
+        must be expressed in WGS84 WKT format for GeoSPARQL spatial function compatibility.</rdfs:comment>
+        <rdfs:label>has geometry</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:contains — inverse of isLocatedIn -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#contains">
+        <owl:inverseOf rdf:resource="http://www.geoiot.org/ontology#isLocatedIn"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:label>contains</rdfs:label>
+    </owl:ObjectProperty>
+
+
+    <!-- =============================================================
+         OBJECT PROPERTIES — Observation Module
+         ============================================================= -->
+
+    <!-- giot:hasStream — device produces an observation stream -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasStream">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:comment>Links an IoTDevice to the ObservationStream (Feed) it produces.</rdfs:comment>
+        <rdfs:label>has stream</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:hasQualityAnnotation — attaches quality metadata to a stream -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasQualityAnnotation">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#QualityAnnotation"/>
+        <rdfs:comment>Attaches data quality metadata to an ObservationStream or individual observation.</rdfs:comment>
+        <rdfs:label>has quality annotation</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:observesProperty — links device to the observable property it measures -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#observesProperty">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/ns/sosa/observes"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#ObservableProperty"/>
+        <rdfs:label>observes property</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:observesLocation — links observation to spatial feature of interest -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#observesLocation">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/ns/sosa/hasFeatureOfInterest"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:label>observes location</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:hasTrend — links a Feed/ObservationStream to derived Trend -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasTrend">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:label>has trend</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:GeneratedByTrend — trend is generated from a feed -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#GeneratedByTrend">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:label>generated by trend</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:valueFeedTrend_ranges — links a ValueFeedTrend to its Range definitions -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasValueRange">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ValueFeedTrend"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#Range"/>
+        <rdfs:label>has value range</rdfs:label>
+    </owl:ObjectProperty>
+
+
+    <!-- =============================================================
+         OBJECT PROPERTIES — Asset Module
+         ============================================================= -->
+
+    <!-- giot:isMonitoredBy — primary cross-module bridge: Asset → IoTDevice -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#isMonitoredBy">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:comment>Primary cross-domain bridge linking a physical Asset to the IoTDevice
+        that monitors it. Enables queries combining GIS/BIM asset descriptions with
+        sensor observation streams.</rdfs:comment>
+        <rdfs:label>is monitored by</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:hasAsset — site contains assets -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasAsset">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:label>has asset</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:hasDevice — site or asset contains IoT devices -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasDevice">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:label>has device</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:hasUsageGroup — asset belongs to a usage group -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasUsageGroup">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#UsageGroup"/>
+        <rdfs:label>has usage group</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:hasEntity — site or asset associated with an IoT agent -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasEntity">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#IoTAgent"/>
+        <rdfs:label>has entity</rdfs:label>
+    </owl:ObjectProperty>
+
+
+    <!-- =============================================================
+         OBJECT PROPERTIES — Domain (Event–Action–Feed loop)
+         ============================================================= -->
+
+    <!-- giot:TriggeredBy — Feed or Event is triggered by an Action -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#TriggeredBy">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Event"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#Action"/>
+        <rdfs:label>triggered by</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:RespondsTo — Action responds to an Event -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#RespondsTo">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Action"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#Event"/>
+        <rdfs:label>responds to</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:CapturedByAction — Action is captured by device or agent -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#CapturedByAction">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Action"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#IoTAgent"/>
+        <rdfs:label>captured by action</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:Operates — IoTAgent operates a Device -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#Operates">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTAgent"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:label>operates</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- giot:hasProperty — generic property attachment (retained for backward compat) -->
+    <owl:ObjectProperty rdf:about="http://www.geoiot.org/ontology#hasProperty">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Action"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Event"/>
+        <rdfs:range rdf:resource="http://www.geoiot.org/ontology#ObservableProperty"/>
+        <rdfs:label>has property</rdfs:label>
+    </owl:ObjectProperty>
+
+
+    <!-- =============================================================
+         DATA PROPERTIES — Site / Spatial
+         ============================================================= -->
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#siteName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>site name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#siteShortName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>site short name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#siteDescription">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>site description</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#siteAddress">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>site address</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#timezone">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>IANA timezone string (e.g., Europe/London) for the site.</rdfs:comment>
+        <rdfs:label>timezone</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#isSubSite">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:comment>True if this site is a subordinate unit within a parent site.</rdfs:comment>
+        <rdfs:label>is sub-site</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#siteSizeMc">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment>Physical linear size of the site in metres.</rdfs:comment>
+        <rdfs:label>site size (m)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#siteSizeMq">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment>Physical area of the site in square metres.</rdfs:comment>
+        <rdfs:label>site area (m2)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- Site Energy KPI Properties — smart campus domain contribution -->
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#averageCostKWh">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment>Average cost per kWh at this site. For unit semantics use QUDT qudt:Unit.</rdfs:comment>
+        <rdfs:label>average cost per kWh</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#contractPowerW">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>contract power (W)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#efficiencyIndex">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Energy efficiency index for the site or asset.</rdfs:comment>
+        <rdfs:label>efficiency index</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#maxDailyEnergyWh">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>max daily energy (Wh)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#maxDailyFedInWh">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>max daily feed-in energy (Wh)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#maxDailySelfConsumptionWh">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>max daily self-consumption (Wh)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#maxPowerFedInW">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>max feed-in power (W)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#maxPowerGenerationW">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>max power generation (W)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#maxPowerW">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>max power (W)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#maxPowerSelfConsumptionW">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>max self-consumption power (W)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#targetDailyGenerationW">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>target daily generation (W)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#targetDailyFedOutWh">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>target daily feed-out (Wh)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#targetPowerFedOutW">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>target feed-out power (W)</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#unitCost">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Site"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>unit cost</rdfs:label>
+    </owl:DatatypeProperty>
+
+
+    <!-- =============================================================
+         DATA PROPERTIES — IoTDevice / Observation Module
+         ============================================================= -->
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#deviceName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>device name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#deviceInternalName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>device internal name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:hasIPAddress — network address (thesis-described) -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#hasIPAddress">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Network IP address or hostname of the IoT device.</rdfs:comment>
+        <rdfs:label>has IP address</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:hasProtocol — controlled vocabulary: MQTT, HTTP, CoAP, Modbus -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#hasProtocol">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Communication protocol of the device. Values from the controlled
+        vocabulary: MQTT, HTTP, CoAP, Modbus.</rdfs:comment>
+        <rdfs:label>has protocol</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:lastCalibrationDate — thesis-described calibration metadata -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#lastCalibrationDate">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+        <rdfs:label>last calibration date</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#calibrationCertificate">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>calibration certificate</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:theoreticalMaxValue — max rated output of a device (from old Device_theoMax) -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#theoreticalMaxValue">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment>Theoretical maximum output value for this device. Used for
+        efficiency calculations (currentValue / theoreticalMaxValue).</rdfs:comment>
+        <rdfs:label>theoretical max value</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:isEnvironmentVariable — device measures an environmental variable -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#isEnvironmentVariable">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:comment>True if the device measures an environmental variable (e.g. weather, air quality).</rdfs:comment>
+        <rdfs:label>is environment variable</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:unitSymbol — measurement unit symbol; align to QUDT unit: for full semantics -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#unitSymbol">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Unit symbol string (e.g. kWh, degC). For machine-readable unit semantics,
+        use qudt:hasUnit pointing to a QUDT unit individual instead.</rdfs:comment>
+        <rdfs:label>unit symbol</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#unitText">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>unit text</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#unitMultiplier">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:comment>Scaling multiplier applied to raw device readings.</rdfs:comment>
+        <rdfs:label>unit multiplier</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#commissioningStatus">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>commissioning status</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#deviceType">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#IoTDevice"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>device type</rdfs:label>
+    </owl:DatatypeProperty>
+
+
+    <!-- =============================================================
+         DATA PROPERTIES — ObservationStream / Feed
+         ============================================================= -->
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#feedName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>feed name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#feedTechnicalName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Technical/internal name used in MQTT topics or API references.</rdfs:comment>
+        <rdfs:label>feed technical name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:feedDirection — input (sensor) or output (actuator) -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#feedDirection">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment>Direction of data flow: 0=input (sensor reading), 1=output (actuator command).</rdfs:comment>
+        <rdfs:label>feed direction</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#feedType">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>feed type</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#feedDataType">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>feed data type</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:feedAddress — physical or network endpoint for the feed -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#feedAddress">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>feed address</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:feedTopic — MQTT topic for this stream -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#feedTopic">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>MQTT topic string used to publish or subscribe to this feed.</rdfs:comment>
+        <rdfs:label>feed topic</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:feedThrottling — rate-limiting/sampling interval -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#feedThrottling">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Throttling/sampling interval applied to this feed (e.g. 15min, 1s).</rdfs:comment>
+        <rdfs:label>feed throttling</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:transformationExpression — data transformation rule applied to raw readings -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#transformationExpression">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Expression or formula applied to transform raw sensor readings before
+        storage (e.g. unit conversion, calibration offset).</rdfs:comment>
+        <rdfs:label>transformation expression</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:cleanEnabled — data cleaning pipeline flag -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#cleanEnabled">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:comment>Whether automated data cleaning is enabled for this feed.</rdfs:comment>
+        <rdfs:label>clean enabled</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:currentValue — latest observed value (Timestamp-Value-Quality pattern) -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#currentValue">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Latest value received from this feed. Part of the Timestamp-Value-Quality
+        pattern. For full semantic observations, use sosa:Observation instances.</rdfs:comment>
+        <rdfs:label>current value</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#currentQuality">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment>Quality score of the latest observation (0-100). Part of the
+        Timestamp-Value-Quality pattern.</rdfs:comment>
+        <rdfs:label>current quality</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#lastValueUpdateTime">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTimeStamp"/>
+        <rdfs:comment>Timestamp of the most recently received value. Part of the
+        Timestamp-Value-Quality pattern.</rdfs:comment>
+        <rdfs:label>last value update time</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- Actuator / bidirectional feed properties -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#lastCommandTime">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTimeStamp"/>
+        <rdfs:comment>Timestamp of the last actuator command issued via this feed.</rdfs:comment>
+        <rdfs:label>last command time</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#lastCommandValue">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>last command value</rdfs:label>
+    </owl:DatatypeProperty>
+
+
+    <!-- =============================================================
+         DATA PROPERTIES — Trend / Series
+         ============================================================= -->
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#trendUnit">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>trend unit</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#trendPrecision">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>trend precision</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#trendSize">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>trend size</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#trendRangeType">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>trend range type</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#trendProfile">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>trend profile</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#trendType">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>trend type</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#lastTrendDataTimestamp">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTimeStamp"/>
+        <rdfs:label>last trend data timestamp</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#lastUpdateTime">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTimeStamp"/>
+        <rdfs:label>last update time</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- Series aggregation -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#seriesOperation">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Series"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment>Aggregation operation applied to generate this series (e.g. mean, sum, max).</rdfs:comment>
+        <rdfs:label>series operation</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#seriesValue">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Series"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+        <rdfs:label>series value</rdfs:label>
+    </owl:DatatypeProperty>
+
+
+    <!-- =============================================================
+         DATA PROPERTIES — Asset
+         ============================================================= -->
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#assetName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>asset name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#assetDescription">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>asset description</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#assetInternalName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>asset internal name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#assetShortName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>asset short name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#assetType">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>asset type</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#assetSubtype">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>asset subtype</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#assetSummaryQuality">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment>Aggregate quality score for this asset based on its device feed qualities.</rdfs:comment>
+        <rdfs:label>asset summary quality</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#isGeo">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:comment>True if the asset has a geospatial representation.</rdfs:comment>
+        <rdfs:label>is geo</rdfs:label>
+    </owl:DatatypeProperty>
+
+
+    <!-- =============================================================
+         DATA PROPERTIES — QualityAnnotation / DiagnosticStatus
+         ============================================================= -->
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#qualityFlag">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#QualityAnnotation"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Quality flag from controlled vocabulary: OK, WARNING, ERROR, UNKNOWN.
+        Use giot:OK, giot:WARNING, giot:ERROR named individuals for typed comparisons.</rdfs:comment>
+        <rdfs:label>quality flag</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#resolutionStatus">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#QualityAnnotation"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment>Resolution status of a quality issue: Resolved, Unresolved, InProgress.</rdfs:comment>
+        <rdfs:label>resolution status</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#severity">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#DiagnosticStatus"/>
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#CurrentSummaryStatus"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:comment>Severity level of the diagnostic condition (e.g. 0=OK, 1=Warning, 2=Error).</rdfs:comment>
+        <rdfs:label>severity</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#statusCategory">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#DiagnosticStatus"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>status category</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#generateEvent">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#DiagnosticStatus"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:comment>Whether this diagnostic condition should trigger an Event instance.</rdfs:comment>
+        <rdfs:label>generate event</rdfs:label>
+    </owl:DatatypeProperty>
+
+
+    <!-- =============================================================
+         DATA PROPERTIES — OperationOptions / Range
+         ============================================================= -->
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#nonVariationIntervalEnabled">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#OperationOptions"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:comment>Dead-band filter: suppress readings if value has not changed within interval.</rdfs:comment>
+        <rdfs:label>non-variation interval enabled</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#nonVariationIntervalValue">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#OperationOptions"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>non-variation interval value</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#notAllowedZero">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#OperationOptions"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:comment>If true, zero values from this feed are treated as invalid/missing.</rdfs:comment>
+        <rdfs:label>not allowed zero</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#rangeEnabled">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Range"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:label>range enabled</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#rangePrecision">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Range"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>range precision</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#rangeType">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Range"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>range type</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#rangeSize">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#Range"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label>range size</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- giot:usageGroupInternalName -->
+    <owl:DatatypeProperty rdf:about="http://www.geoiot.org/ontology#usageGroupInternalName">
+        <rdfs:domain rdf:resource="http://www.geoiot.org/ontology#UsageGroup"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>usage group internal name</rdfs:label>
+    </owl:DatatypeProperty>
+
+
+    <!-- =============================================================
+         CLASSES — Spatial Module
+         ============================================================= -->
+
+    <!-- giot:SpatialEntity — top-level spatial class -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#SpatialEntity">
+        <rdfs:subClassOf rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+        <rdfs:subClassOf rdf:resource="https://schema.org/Place"/>
+        <rdfs:comment>Top-level class subsuming all spatially-located entities in the
+        GeoIoT ontology. Subsumes Site, Building, Zone, and Boundary.</rdfs:comment>
+        <rdfs:label>Spatial Entity</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Site ≡ geo:Feature (GeoSPARQL alignment axiom) -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Site">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <owl:equivalentClass rdf:resource="http://www.opengis.net/ont/geosparql#Feature"/>
+        <rdfs:comment>A bounded outdoor or campus-level area, corresponding broadly to a
+        geo:Feature in GeoSPARQL with an associated polygon geometry. Sites hierarchically
+        organise an IoT infrastructure.</rdfs:comment>
+        <rdfs:label>Site</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Building ⊑ bot:Space (BOT alignment) -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Building">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:subClassOf rdf:resource="https://w3id.org/bot#Space"/>
+        <rdfs:comment>A structure on a site, modelled as a bot:Space for BIM/BOT
+        interoperability. A Building is located within a Site via giot:isLocatedIn.</rdfs:comment>
+        <rdfs:label>Building</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Zone ⊑ bot:Space (BOT alignment) -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Zone">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:subClassOf rdf:resource="https://w3id.org/bot#Space"/>
+        <rdfs:comment>A spatial subdivision of a building (floor, room, thermal zone).
+        Zones can be adjacent via giot:isAdjacentTo and are contained within Buildings
+        via the transitive giot:isLocatedIn property.</rdfs:comment>
+        <rdfs:label>Zone</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Boundary — topological interface between zones -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Boundary">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#SpatialEntity"/>
+        <rdfs:comment>A topological interface between two adjacent zones (e.g. a wall,
+        floor/ceiling, or door). Used to model spatial adjacency.</rdfs:comment>
+        <rdfs:label>Boundary</rdfs:label>
+    </owl:Class>
+
+
+    <!-- =============================================================
+         CLASSES — Observation Module
+         ============================================================= -->
+
+    <!-- giot:IoTDevice ⊑ sosa:Sensor (SOSA alignment) -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#IoTDevice">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/sosa/Sensor"/>
+        <rdfs:comment>An IoT hardware device (sensor or actuator) deployed within a Site
+        for monitoring or control. Extends sosa:Sensor with network address, protocol,
+        and calibration metadata.</rdfs:comment>
+        <rdfs:label>IoT Device</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:ObservationStream — named continuous data stream (Feed) -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#ObservationStream">
+        <rdfs:comment>Represents a named, continuous series of observations from an IoTDevice.
+        Assigned a canonical URI that persists across pipeline versions. Enables quality
+        metadata to be attached at stream level rather than replicated on every observation.
+        Equivalent to the Feed concept in the SEND platform.</rdfs:comment>
+        <rdfs:label>Observation Stream</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Feed — alias/subclass of ObservationStream for SEND compatibility -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Feed">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:comment>Raw and real-time data feed from an IoT device. Subclass of
+        ObservationStream. Follows the Timestamp-Value-Quality structure.</rdfs:comment>
+        <rdfs:label>Feed</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:QualityAnnotation ⊑ ObservationStream — data quality metadata -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#QualityAnnotation">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:comment>Attaches data quality metadata to either individual observations or
+        entire streams. Uses a controlled vocabulary (OK, WARNING, ERROR, UNKNOWN) aligned
+        with the W3C Data Quality Vocabulary.</rdfs:comment>
+        <rdfs:label>Quality Annotation</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:ObservableProperty ≡ ssn:Property (SSN alignment) -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#ObservableProperty">
+        <owl:equivalentClass rdf:resource="http://www.w3.org/ns/ssn/Property"/>
+        <rdfs:comment>A measurable property of a Feature of Interest (e.g. temperature,
+        energy consumption, CO2 level). Equivalent to ssn:Property.</rdfs:comment>
+        <rdfs:label>Observable Property</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Trend — patterns derived from ObservationStreams -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Trend">
+        <rdfs:comment>Aggregated patterns or statistical summaries derived from
+        ObservationStream data (e.g. daily/weekly averages, moving averages).</rdfs:comment>
+        <rdfs:label>Trend</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Series ⊑ Trend — specific time-series aggregation -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Series">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:comment>Aggregated and processed data derived from Feeds to facilitate
+        analysis of long-term patterns and variations (e.g. daily/weekly/monthly averages).</rdfs:comment>
+        <rdfs:label>Series</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:ValueFeedTrend — value range threshold monitoring -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#ValueFeedTrend">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#Trend"/>
+        <rdfs:comment>A trend class that monitors observed values against defined Range
+        thresholds for alerting and anomaly detection.</rdfs:comment>
+        <rdfs:label>Value Feed Trend</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Range — threshold/alarm range for sensor values -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Range">
+        <rdfs:comment>Defines a value range (min/max thresholds) for a sensor feed,
+        used for alerting and quality classification.</rdfs:comment>
+        <rdfs:label>Range</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:DiagnosticStatus — device-level health status -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#DiagnosticStatus">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#QualityAnnotation"/>
+        <rdfs:comment>Device-level diagnostic health information including severity,
+        status category, and whether a condition should generate an Event.</rdfs:comment>
+        <rdfs:label>Diagnostic Status</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:OperationOptions — data collection quality rules for a Feed -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#OperationOptions">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#ObservationStream"/>
+        <rdfs:comment>Configuration rules governing how a Feed is collected and filtered,
+        including dead-band filtering and zero-value suppression.</rdfs:comment>
+        <rdfs:label>Operation Options</rdfs:label>
+    </owl:Class>
+
+
+    <!-- =============================================================
+         CLASSES — Asset Module
+         ============================================================= -->
+
+    <!-- giot:PhysicalObject — base class for physical entities -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#PhysicalObject">
+        <rdfs:comment>A physical entity with material existence and measurable properties
+        (e.g. mass, dimensions, operational state).</rdfs:comment>
+        <rdfs:label>Physical Object</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Asset ≡ SpatialEntity ⊓ PhysicalObject (OWL intersection axiom) -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Asset">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.geoiot.org/ontology#SpatialEntity"/>
+                    <rdf:Description rdf:about="http://www.geoiot.org/ontology#PhysicalObject"/>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:comment>A physical or virtual entity of value in the IoT ecosystem. Defined
+        as the OWL intersection of SpatialEntity and PhysicalObject, ensuring every asset
+        has both a spatial location and physical properties. Monitored via giot:isMonitoredBy.</rdfs:comment>
+        <rdfs:label>Asset</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:PhysicalAsset ⊑ Asset -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#PhysicalAsset">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:comment>Tangible physical infrastructure (e.g. solar panels, wind turbines,
+        combined heat and power units, HVAC equipment).</rdfs:comment>
+        <rdfs:label>Physical Asset</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:VirtualAsset ⊑ Asset -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#VirtualAsset">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:comment>Virtual asset that represents the digital counterpart of a physical
+        asset, synchronised via real-time data.</rdfs:comment>
+        <rdfs:label>Virtual Asset</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:UsageGroup ⊑ Asset — asset classification by usage type -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#UsageGroup">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#Asset"/>
+        <rdfs:comment>Classifies assets by operational usage type (e.g. HVAC, lighting,
+        renewable generation, metering). Supports cross-domain energy analysis queries.</rdfs:comment>
+        <rdfs:label>Usage Group</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:CurrentSummaryStatus — asset-level operational status -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#CurrentSummaryStatus">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#QualityAnnotation"/>
+        <rdfs:comment>Captures the current operational status summary for an asset,
+        including severity level and a human-readable status label.</rdfs:comment>
+        <rdfs:label>Current Summary Status</rdfs:label>
+    </owl:Class>
+
+
+    <!-- =============================================================
+         CLASSES — Domain (Event–Action loop)
+         ============================================================= -->
+
+    <!-- giot:Action -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Action">
+        <rdfs:comment>Operations or tasks in the IoT system, triggered by specific Events
+        or conditions and captured by Devices or IoTAgents.</rdfs:comment>
+        <rdfs:label>Action</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Event -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Event">
+        <rdfs:comment>Significant occurrences or changes in the IoT system (e.g. threshold
+        breach, device failure) that often lead to Actions.</rdfs:comment>
+        <rdfs:label>Event</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:IoTAgent -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#IoTAgent">
+        <rdfs:comment>Intangible software components (applications, algorithms, middleware)
+        that operate IoT Devices and mediate data flows.</rdfs:comment>
+        <rdfs:label>IoT Agent</rdfs:label>
+    </owl:Class>
+
+    <!-- giot:Property — retained for backward compatibility with SEND data model -->
+    <owl:Class rdf:about="http://www.geoiot.org/ontology#Property">
+        <rdfs:subClassOf rdf:resource="http://www.geoiot.org/ontology#ObservableProperty"/>
+        <rdfs:comment>Domain-specific observable property. Subclass of ObservableProperty
+        (which is equivalent to ssn:Property). Retained for compatibility.</rdfs:comment>
+        <rdfs:label>Property</rdfs:label>
+    </owl:Class>
+
+
+    <!-- =============================================================
+         NAMED INDIVIDUALS — Quality Flag Vocabulary
+         ============================================================= -->
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#OK">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:comment>Quality flag: observation is valid and within expected parameters.</rdfs:comment>
+        <rdfs:label>OK</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#WARNING">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:comment>Quality flag: observation is outside normal range but not erroneous.</rdfs:comment>
+        <rdfs:label>WARNING</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#ERROR">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:comment>Quality flag: observation is erroneous or device is in fault state.</rdfs:comment>
+        <rdfs:label>ERROR</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#UNKNOWN">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:comment>Quality flag: quality of observation cannot be determined.</rdfs:comment>
+        <rdfs:label>UNKNOWN</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#Unresolved">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:comment>Resolution status: a quality issue that has not yet been addressed.</rdfs:comment>
+        <rdfs:label>Unresolved</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#Resolved">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:label>Resolved</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#InProgress">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:label>In Progress</rdfs:label>
+    </owl:NamedIndividual>
+
+
+    <!-- =============================================================
+         NAMED INDIVIDUALS — Protocol Vocabulary
+         ============================================================= -->
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#MQTT">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:comment>MQTT communication protocol for IoT devices.</rdfs:comment>
+        <rdfs:label>MQTT</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#HTTP">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:label>HTTP</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#CoAP">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:label>CoAP</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="http://www.geoiot.org/ontology#Modbus">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:label>Modbus</rdfs:label>
+    </owl:NamedIndividual>
+
+</rdf:RDF>
