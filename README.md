@@ -16,6 +16,7 @@ The ontology is designed to:
 2. Namespace: https://www.geoiot.org/ontology#
 3. Preferred prefix: giot
 4. Current version IRI: https://www.geoiot.org/ontology/2.0
+GeoIoT Ontology (v2.0) Diagram, a modular ontology integrating geospatial context, IoT observations, and physical assets for smart campus/smart city use cases.
 
 ## Core Modules
 
