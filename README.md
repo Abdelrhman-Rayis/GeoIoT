@@ -1,66 +1,140 @@
-# GeoIoT Main Ontology
+# GeoIoT Ontology
 
-## Overview
+GeoIoT is a modular ontology for integrating geospatial and IoT knowledge in smart campus and smart city systems. It provides a shared semantic layer for data integration, reasoning, and SPARQL querying across GIS, BIM, sensors, and operational asset data.
 
-The GeoIoT Ontology is a modular OWL 2 ontology for integrating geospatial and IoT knowledge in smart city and smart campus systems. It provides a shared semantic layer for data integration, reasoning, and SPARQL querying across heterogeneous sources such as GIS, BIM, sensor streams, and operational asset data.
+## Scope
 
-- Base ontology IRI: http://www.geoiot.org/ontology
-- Namespace: http://www.geoiot.org/ontology#
-- Current version IRI: http://www.geoiot.org/ontology/2.0
-- Preferred prefix: `giot`
+The ontology is designed to:
+1. Represent spatial entities such as sites, buildings, and zones.
+2. Represent IoT devices, observation streams, and quality annotations.
+3. Bridge physical assets and monitoring devices.
+4. Support interoperable querying and inference using standards-aligned semantics.
+
+## Namespace and Version
+
+1. Ontology IRI: https://www.geoiot.org/ontology
+2. Namespace: https://www.geoiot.org/ontology#
+3. Preferred prefix: giot
+4. Current version IRI: https://www.geoiot.org/ontology/2.0
 
 ## Core Modules
 
-### 1. Spatial Module
+### Spatial Module
 
-Extends GeoSPARQL and BOT-aligned spatial modeling.
+Main concepts:
+1. SpatialEntity
+2. Site
+3. Building
+4. Zone
+5. Boundary
 
-Key ideas:
+Main properties:
+1. isLocatedIn
+2. isAdjacentTo
+3. hasGeometry
+4. contains
 
-- Hierarchical spatial containment (for example: Site -> Building -> Zone)
-- Transitive location reasoning via `giot:isLocatedIn`
-- Symmetric adjacency via `giot:isAdjacentTo`
-- Geometry linkage via `giot:hasGeometry`
+### Observation Module
 
-### 2. Observation Module
+Main concepts:
+1. IoTDevice
+2. ObservationStream
+3. ObservableProperty
+4. QualityAnnotation
+5. Trend
 
-Extends SOSA/SSN with IoT-specific stream and quality concepts.
+Main properties:
+1. hasStream
+2. hasQualityAnnotation
+3. observesProperty
+4. observesLocation
+5. hasTrend
 
-Key ideas:
+### Asset Module
 
-- Device-to-stream relation via `giot:hasStream`
-- Feature/property observation alignment via `giot:observesProperty` and `giot:observesLocation`
-- Quality attachment via `giot:hasQualityAnnotation`
+Main concepts:
+1. Asset
+2. IoTAgent
+3. UsageGroup
 
-### 3. Asset Module
+Main properties:
+1. isMonitoredBy
+2. hasAsset
+3. hasDevice
+4. hasUsageGroup
+5. hasEntity
 
-Bridges physical assets to IoT monitoring and observation streams.
+## Imported and Aligned Standards
 
-Key ideas:
+The ontology aligns with:
+1. GeoSPARQL
+2. SOSA
+3. SSN
+4. BOT
+5. QUDT
+6. PROV-O
 
-- Cross-domain bridge: `giot:isMonitoredBy` (Asset -> IoTDevice)
-- Asset and device organization via `giot:hasAsset`, `giot:hasDevice`, and related properties
+## Competency Questions and Example SPARQL
 
-## External Standards and Imports
+### CQ1
+Which sensors are located within a given building?
 
-The ontology imports and aligns with key standards:
+SPARQL:
+PREFIX giot: <https://www.geoiot.org/ontology#>
 
-- GeoSPARQL
-- SOSA / SSN
-- BOT
-- QUDT
-- PROV-O (used in provenance-aligned modeling)
+SELECT ?sensor ?stream WHERE {
+  ?sensor a giot:IoTDevice ;
+          giot:isLocatedIn ?zone ;
+          giot:hasStream ?stream .
+  ?zone giot:isLocatedIn <https://example.org/entity/building/ENG-B> .
+}
 
-## Why This Ontology
+### CQ2
+Which assets are monitored by devices whose streams have quality flags?
 
-The main ontology enables:
+SPARQL:
+PREFIX giot: <https://www.geoiot.org/ontology#>
 
-- Interoperable data integration across heterogeneous systems
-- Rule-based inference over spatial and IoT relationships
-- Reusable, standards-aligned query patterns in SPARQL
-- Clear separation of core semantic structures from domain-specific extensions
+SELECT ?asset ?device ?qa WHERE {
+  ?asset a giot:Asset ;
+         giot:isMonitoredBy ?device .
+  ?device giot:hasStream ?stream .
+  ?stream giot:hasQualityAnnotation ?qa .
+}
 
-## Notes
+### CQ3
+How can a location assertion be traced to its provenance activity?
 
-- The ontology was developed using an iterative methodology and evaluated with reasoner-based checks.
-- Domain extensions can build on `giot:` while preserving a stable core namespace.
+SPARQL:
+PREFIX giot: <https://www.geoiot.org/ontology#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?graph ?activity ?time WHERE {
+  GRAPH ?graph {
+    <https://example.org/entity/zone/ENG-B-201> giot:isLocatedIn ?b .
+  }
+  ?graph prov:wasGeneratedBy ?activity .
+  ?activity prov:endedAtTime ?time .
+}
+
+## Repository Contents
+
+1. geoiot-ontology.owl
+2. Optional serializations: geoiot-ontology.ttl, geoiot-ontology.jsonld
+3. Documentation files
+4. Catalog files for ontology tooling (optional)
+
+## Release and Versioning Policy
+
+1. Semantic versioning is used for ontology releases.
+2. Every release is tagged in GitHub.
+3. The changelog records added, changed, and deprecated terms.
+4. Previous versions remain accessible for reproducibility.
+
+## Validation and Quality Assurance
+
+Before each release:
+1. Syntax validation for RDF/OWL serialization.
+2. Reasoner consistency check.
+3. Namespace consistency check.
+4. Example SPARQL query check.
